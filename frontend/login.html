@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Narayan AI · BTechX</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #f5d07a;
+      --gold-dim: #8a6f30;
+      --black: #060608;
+      --surface: #0f0f11;
+      --card: #141416;
+      --border: rgba(201, 168, 76, 0.2);
+      --border-hover: rgba(201, 168, 76, 0.5);
+      --text: #eee;
+      --muted: #777;
+      --error: #f87171;
+      --success: #4ade80;
+    }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* ── Ambient ── */
+    .ambient {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .a1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(201, 168, 76, 0.07), transparent 70%);
+      top: -200px;
+      left: -200px;
+    }
+
+    .a2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(201, 168, 76, 0.05), transparent 70%);
+      bottom: -100px;
+      right: -100px;
+    }
+
+    /* ── BTechX Banner ── */
+    .btechx-banner {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      background: linear-gradient(135deg, #0a0800, #1a1200, #0a0800);
+      border-bottom: 1px solid var(--gold-dim);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .btechx-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btechx-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 900;
+      color: #000;
+      box-shadow: 0 0 20px rgba(201, 168, 76, 0.4);
+    }
+
+    .btechx-name {
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.1em;
+    }
+
+    .banner-sep {
+      color: var(--gold-dim);
+      font-size: 18px;
+    }
+
+    .banner-sub {
+      font-size: 12px;
+      color: var(--gold-dim);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    /* ── Main layout ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    /* ── Card ── */
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 44px 40px;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(201, 168, 76, 0.05);
+      animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── Card header ── */
+    .card-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(201, 168, 76, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 6px 16px;
+      margin-bottom: 20px;
+    }
+
+    .ai-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 8px var(--gold);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
+    }
+
+    .ai-badge-text {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 40%, var(--gold-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .card-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── Gold divider ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+      margin: 0 0 28px;
+    }
+
+    /* ── Form ── */
+    .field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    input {
+      width: 100%;
+      background: #0c0c0e;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 16px;
+      font-size: 14px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
+    }
+
+    input::placeholder {
+      color: #444;
+    }
+
+    /* ── Submit button ── */
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #000;
+      font-weight: 700;
+      font-size: 15px;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      letter-spacing: 0.03em;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3);
+      margin-top: 8px;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 28px rgba(201, 168, 76, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── Forgot password ── */
+    .forgot {
+      text-align: right;
+      margin-top: -10px;
+      margin-bottom: 18px;
+    }
+
+    .forgot a {
+      font-size: 12px;
+      color: var(--gold-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .forgot a:hover {
+      color: var(--gold);
+    }
+
+    /* ── Alert ── */
+    .alert {
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 18px;
+      display: none;
+    }
+
+    .alert.error {
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+      color: var(--error);
+    }
+
+    .alert.success {
+      background: rgba(74, 222, 128, 0.1);
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      color: var(--success);
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    /* ── Footer links ── */
+    .card-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .card-footer a {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .card-footer a:hover {
+      color: var(--gold-light);
+    }
+
+    /* ── Page footer ── */
+    .page-footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 20px;
+      font-size: 11px;
+      color: #333;
+      letter-spacing: 0.1em;
+    }
+
+    .page-footer span {
+      color: var(--gold-dim);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="ambient a1"></div>
+  <div class="ambient a2"></div>
+
+  <!-- BTechX Banner -->
+  <div class="btechx-banner">
+    <div class="btechx-logo">
+      <div class="btechx-icon">⚡</div>
+      <span class="btechx-name">BTechX</span>
+    </div>
+    <span class="banner-sep">·</span>
+    <span class="banner-sub">Narayan AI — Academic Intelligence Platform</span>
+  </div>
+
+  <div class="page">
+    <div class="card">
+      <div class="card-header">
+        <div class="ai-badge">
+          <div class="ai-dot"></div>
+          <span class="ai-badge-text">Narayan AI · Online</span>
+        </div>
+        <div class="card-title">Welcome Back</div>
+        <div class="card-sub">Sign in with your CGU college email to continue</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="alert error" id="alertBox"></div>
+
+      <div class="field">
+        <label>College Email</label>
+        <input type="email" id="email" placeholder="yourname@cgu-odisha.ac.in" autocomplete="email" />
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" />
+      </div>
+
+      <div class="forgot">
+        <a href="/reset-password">Forgot password?</a>
+      </div>
+
+      <button class="btn" id="loginBtn" onclick="doLogin()">Sign In →</button>
+
+      <div class="card-footer">
+        Don't have an account? <a href="/register">Register here</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">© 2024 <span>BTechX</span> · Narayan AI · CGU Odisha</div>
+
+  <script>
+    const emailEl = document.getElementById('email');
+    const passEl = document.getElementById('password');
+    const alertBox = document.getElementById('alertBox');
+    const btn = document.getElementById('loginBtn');
+
+    function showAlert(msg, type = 'error') {
+      alertBox.textContent = msg;
+      alertBox.className = `alert ${type} show`;
+    }
+
+    async function doLogin() {
+      const email = emailEl.value.trim();
+      const password = passEl.value;
+      if (!email || !password) { showAlert('Please enter email and password.'); return; }
+
+      btn.disabled = true; btn.textContent = 'Signing in…';
+      alertBox.className = 'alert';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          // Save user info for the chat page
+          localStorage.setItem('narayan_user', JSON.stringify(data.user));
+          showAlert('Login successful! Redirecting…', 'success');
+          setTimeout(() => { window.location.href = '/chat'; }, 900);
+        } else {
+          showAlert(data.error || 'Login failed.');
+          btn.disabled = false; btn.textContent = 'Sign In →';
+        }
+      } catch (e) {
+        showAlert('Network error. Is the server running?');
+        btn.disabled = false; btn.textContent = 'Sign In →';
+      }
+    }
+
+    // Enter key
+    [emailEl, passEl].forEach(el => el.addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    }));
+  </script>
+</body>
+
+</html>

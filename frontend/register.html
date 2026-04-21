@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — Narayan AI · BTechX</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #f5d07a;
+      --gold-dim: #8a6f30;
+      --black: #060608;
+      --surface: #0f0f11;
+      --card: #141416;
+      --border: rgba(201, 168, 76, 0.2);
+      --border-hover: rgba(201, 168, 76, 0.5);
+      --text: #eee;
+      --muted: #777;
+      --error: #f87171;
+      --success: #4ade80;
+    }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    .ambient {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .a1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(201, 168, 76, 0.07), transparent 70%);
+      top: -200px;
+      right: -200px;
+    }
+
+    .a2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(201, 168, 76, 0.05), transparent 70%);
+      bottom: -100px;
+      left: -100px;
+    }
+
+    /* Banner */
+    .btechx-banner {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      background: linear-gradient(135deg, #0a0800, #1a1200, #0a0800);
+      border-bottom: 1px solid var(--gold-dim);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .btechx-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btechx-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 900;
+      color: #000;
+      box-shadow: 0 0 20px rgba(201, 168, 76, 0.4);
+    }
+
+    .btechx-name {
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.1em;
+    }
+
+    .banner-sep {
+      color: var(--gold-dim);
+      font-size: 18px;
+    }
+
+    .banner-sub {
+      font-size: 12px;
+      color: var(--gold-dim);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 44px 40px;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6);
+      animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(201, 168, 76, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 6px 16px;
+      margin-bottom: 20px;
+    }
+
+    .ai-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 8px var(--gold);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
+    }
+
+    .ai-badge-text {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 26px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 40%, var(--gold-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .card-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+      margin: 0 0 28px;
+    }
+
+    /* Two column grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 16px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      background: #0c0c0e;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c9a84c' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+
+    select option {
+      background: #141416;
+      color: var(--text);
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
+    }
+
+    input::placeholder {
+      color: #444;
+    }
+
+    /* Password strength */
+    .pw-strength {
+      margin-top: 6px;
+      height: 3px;
+      border-radius: 4px;
+      background: #1a1a1a;
+      overflow: hidden;
+    }
+
+    .pw-bar {
+      height: 100%;
+      border-radius: 4px;
+      width: 0;
+      transition: width 0.3s, background 0.3s;
+    }
+
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #000;
+      font-weight: 700;
+      font-size: 15px;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3);
+      margin-top: 8px;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 28px rgba(201, 168, 76, 0.4);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 18px;
+      display: none;
+    }
+
+    .alert.error {
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+      color: var(--error);
+    }
+
+    .alert.success {
+      background: rgba(74, 222, 128, 0.1);
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      color: var(--success);
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .domain-hint {
+      font-size: 11px;
+      color: var(--gold-dim);
+      margin-top: 5px;
+    }
+
+    .card-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .card-footer a {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .card-footer a:hover {
+      color: var(--gold-light);
+    }
+
+    .page-footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 20px;
+      font-size: 11px;
+      color: #333;
+      letter-spacing: 0.1em;
+    }
+
+    .page-footer span {
+      color: var(--gold-dim);
+    }
+
+    @media(max-width:480px) {
+      .card {
+        padding: 32px 24px;
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="ambient a1"></div>
+  <div class="ambient a2"></div>
+
+  <!-- BTechX Banner -->
+  <div class="btechx-banner">
+    <div class="btechx-logo">
+      <div class="btechx-icon">⚡</div>
+      <span class="btechx-name">BTechX</span>
+    </div>
+    <span class="banner-sep">·</span>
+    <span class="banner-sub">Narayan AI — Academic Intelligence Platform</span>
+  </div>
+
+  <div class="page">
+    <div class="card">
+      <div class="card-header">
+        <div class="ai-badge">
+          <div class="ai-dot"></div>
+          <span class="ai-badge-text">CGU Odisha · Student Portal</span>
+        </div>
+        <div class="card-title">Create Account</div>
+        <div class="card-sub">Register with your official CGU college email to access Narayan AI</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="alert error" id="alertBox"></div>
+
+      <!-- Full Name -->
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="full_name" placeholder="e.g. Subham Moharana" />
+      </div>
+
+      <!-- Email -->
+      <div class="field">
+        <label>College Email</label>
+        <input type="email" id="email" placeholder="yourname@cgu-odisha.ac.in" />
+        <div class="domain-hint">⚠ Only @cgu-odisha.ac.in emails are accepted</div>
+      </div>
+
+      <!-- Branch + Roll Number -->
+      <div class="grid-2">
+        <div class="field">
+          <label>Branch</label>
+          <select id="branch">
+            <option value="" disabled selected>Select branch</option>
+            <option>CSE</option>
+            <option>ECE</option>
+            <option>EEE</option>
+            <option>Mechanical</option>
+            <option>Civil</option>
+            <option>IT</option>
+            <option>Chemical</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Roll Number</label>
+          <input type="text" id="roll_number" placeholder="e.g. 22CS001" />
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Min. 8 characters" oninput="checkStrength(this.value)" />
+        <div class="pw-strength">
+          <div class="pw-bar" id="pwBar"></div>
+        </div>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="field">
+        <label>Confirm Password</label>
+        <input type="password" id="confirm_password" placeholder="Re-enter password" />
+      </div>
+
+      <button class="btn" id="regBtn" onclick="doRegister()">Create Account →</button>
+
+      <div class="card-footer">
+        Already have an account? <a href="/">Sign In</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">© 2024 <span>BTechX</span> · Narayan AI · CGU Odisha</div>
+
+  <script>
+    const alertBox = document.getElementById('alertBox');
+    const btn = document.getElementById('regBtn');
+
+    function showAlert(msg, type = 'error') {
+      alertBox.textContent = msg;
+      alertBox.className = `alert ${type} show`;
+    }
+
+    function checkStrength(pw) {
+      const bar = document.getElementById('pwBar');
+      let score = 0;
+      if (pw.length >= 8) score++;
+      if (/[A-Z]/.test(pw)) score++;
+      if (/[0-9]/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+      const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e'];
+      const widths = ['25%', '50%', '75%', '100%'];
+      bar.style.width = pw ? widths[score - 1] || '10%' : '0';
+      bar.style.background = pw ? colors[score - 1] || '#ef4444' : 'transparent';
+    }
+
+    async function doRegister() {
+      const full_name = document.getElementById('full_name').value.trim();
+      const email = document.getElementById('email').value.trim().toLowerCase();
+      const branch = document.getElementById('branch').value;
+      const roll_number = document.getElementById('roll_number').value.trim();
+      const password = document.getElementById('password').value;
+      const confirm = document.getElementById('confirm_password').value;
+
+      if (!full_name || !email || !branch || !roll_number || !password || !confirm) {
+        showAlert('Please fill in all fields.'); return;
+      }
+      if (!email.endsWith('@cgu-odisha.ac.in')) {
+        showAlert('Only @cgu-odisha.ac.in email addresses are allowed.'); return;
+      }
+      if (password.length < 8) {
+        showAlert('Password must be at least 8 characters.'); return;
+      }
+      if (password !== confirm) {
+        showAlert('Passwords do not match.'); return;
+      }
+
+      btn.disabled = true; btn.textContent = 'Creating account…';
+      alertBox.className = 'alert';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ full_name, email, password, branch, roll_number })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert('🎉 ' + data.message, 'success');
+          btn.textContent = 'Check your email!';
+        } else {
+          showAlert(data.error || 'Registration failed.');
+          btn.disabled = false; btn.textContent = 'Create Account →';
+        }
+      } catch (e) {
+        showAlert('Network error. Is the server running?');
+        btn.disabled = false; btn.textContent = 'Create Account →';
+      }
+    }
+  </script>
+</body>
+
+</html>
