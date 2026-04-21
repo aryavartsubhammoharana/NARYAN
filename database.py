@@ -1,6 +1,6 @@
 # ==========================================================
-# 🗄️  NARYAN AI — DATABASE LAYER
-#     PostgreSQL (production) | SQLite (dev fallback)
+# 🗄️  NARYAN AI — DATABASE LAYER (FINAL VERSION)
+#     PostgreSQL (Render Production) | SQLite (Local Dev)
 # ==========================================================
 
 import os
@@ -8,60 +8,67 @@ import logging
 import sqlite3
 from contextlib import contextmanager
 
+# Logging setup
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("NARYAN_AI.db")
 
-# Detect if we should use PostgreSQL (Render) or SQLite (Local)
-# If DATABASE_URL is present in Render environment variables, use Postgres
+# Render environment variables से DATABASE_URL उठाना
 DATABASE_URL = os.getenv("DATABASE_URL")
 USE_POSTGRES = DATABASE_URL is not None
 DB_PATH      = os.getenv("SQLITE_PATH", "narayan_ai.db")
 
-# ── Context manager ────────────────────────────────────────
+# ── Database Connection Manager ───────────────────────────
 @contextmanager
 def get_db():
+    """Context manager to handle database connections safely."""
     if USE_POSTGRES:
         import psycopg2
         from psycopg2.extras import RealDictCursor
-        # Connect to Render PostgreSQL
+        # PostgreSQL Connection (Render)
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         try:
             yield cursor
             conn.commit()
-        except Exception:
+        except Exception as e:
             conn.rollback()
+            logger.error(f"Postgres Transaction Error: {e}")
             raise
         finally:
             cursor.close()
             conn.close()
     else:
+        # SQLite Connection (Local Fallback)
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         try:
             yield cursor
             conn.commit()
-        except Exception:
+        except Exception as e:
             conn.rollback()
+            logger.error(f"SQLite Transaction Error: {e}")
             raise
         finally:
             cursor.close()
             conn.close()
 
-# ── Database Initialization ────────────────────────────────
+# ── Database Initialisation Logic ────────────────────────
 def init_db():
-    """Main function to create all tables."""
+    """Main entry point to create all tables."""
     try:
         if USE_POSTGRES:
             _init_postgres()
+            logger.info("PostgreSQL Database Initialised ✅")
         else:
             _init_sqlite()
-        logger.info("Database initialised ✅")
+            logger.info("SQLite Database Initialised ✅")
     except Exception as e:
         logger.error(f"Failed to initialise database: {e}")
         raise e
 
 def _init_sqlite():
+    """Creates tables in SQLite (Local)."""
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.executescript("""
@@ -78,6 +85,7 @@ def _init_sqlite():
             reset_expires   DATETIME,
             created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
         );
+
         CREATE TABLE IF NOT EXISTS chat_history (
             id         INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id    INTEGER,
@@ -93,13 +101,13 @@ def _init_sqlite():
     conn.close()
 
 def _init_postgres():
+    """Creates tables in PostgreSQL (Render)."""
     import psycopg2
-    # Connect to Render PostgreSQL
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
     
     statements = [
-        # PostgreSQL uses SERIAL for auto-increment and TEXT/VARCHAR is similar
+        # Users Table
         """CREATE TABLE IF NOT EXISTS users (
             id            SERIAL PRIMARY KEY,
             full_name     VARCHAR(150) NOT NULL,
@@ -113,16 +121,18 @@ def _init_postgres():
             reset_expires TIMESTAMP,
             created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )""",
+        # Chat History Table
         """CREATE TABLE IF NOT EXISTS chat_history (
             id         SERIAL PRIMARY KEY,
             user_id    INT,
             session_id VARCHAR(64),
-            question   TEXT,
-            answer     TEXT,
+            question   TEXT NOT NULL,
+            answer     TEXT NOT NULL,
             intent     VARCHAR(50),
             subject    VARCHAR(100),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )""",
+        # Files Table
         """CREATE TABLE IF NOT EXISTS files (
             id        SERIAL PRIMARY KEY,
             subject   VARCHAR(100),
@@ -132,6 +142,7 @@ def _init_postgres():
             file_type VARCHAR(20),
             added_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )""",
+        # Progress Table
         """CREATE TABLE IF NOT EXISTS study_progress (
             id        SERIAL PRIMARY KEY,
             user_id   INT,
@@ -139,6 +150,7 @@ def _init_postgres():
             topic     VARCHAR(200),
             completed BOOLEAN DEFAULT FALSE
         )""",
+        # Test Results Table
         """CREATE TABLE IF NOT EXISTS test_results (
             id       SERIAL PRIMARY KEY,
             user_id  INT,
