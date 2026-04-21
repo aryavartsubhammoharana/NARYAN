@@ -1,6 +1,6 @@
 # ==========================================================
 # 🗄️  NARYAN AI — DATABASE LAYER
-#     MySQL (production) | SQLite (dev fallback)
+#     PostgreSQL (production) | SQLite (dev fallback)
 # ==========================================================
 
 import os
@@ -10,28 +10,21 @@ from contextlib import contextmanager
 
 logger = logging.getLogger("NARYAN_AI.db")
 
-# Render environment variables से सेटिंग्स उठाना
-USE_MYSQL = os.getenv("USE_MYSQL", "false").lower() == "true"
-DB_PATH   = os.getenv("SQLITE_PATH", "narayan_ai.db")
-
-MYSQL_CONFIG = {}
-if USE_MYSQL:
-    # MySQL settings (Aiven के लिए)
-    MYSQL_CONFIG = {
-        "host":     os.getenv("MYSQL_HOST"),
-        "port":     int(os.getenv("MYSQL_PORT", 19706)),
-        "user":     os.getenv("MYSQL_USER", "avnadmin"),
-        "password": os.getenv("MYSQL_PASSWORD"),
-        "database": os.getenv("MYSQL_DATABASE", "defaultdb"),
-    }
+# Detect if we should use PostgreSQL (Render) or SQLite (Local)
+# If DATABASE_URL is present in Render environment variables, use Postgres
+DATABASE_URL = os.getenv("DATABASE_URL")
+USE_POSTGRES = DATABASE_URL is not None
+DB_PATH      = os.getenv("SQLITE_PATH", "narayan_ai.db")
 
 # ── Context manager ────────────────────────────────────────
 @contextmanager
 def get_db():
-    if USE_MYSQL:
-        import mysql.connector
-        conn   = mysql.connector.connect(**MYSQL_CONFIG)
-        cursor = conn.cursor(dictionary=True)
+    if USE_POSTGRES:
+        import psycopg2
+        from psycopg2.extras import RealDictCursor
+        # Connect to Render PostgreSQL
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
         try:
             yield cursor
             conn.commit()
@@ -59,8 +52,8 @@ def get_db():
 def init_db():
     """Main function to create all tables."""
     try:
-        if USE_MYSQL:
-            _init_mysql()
+        if USE_POSTGRES:
+            _init_postgres()
         else:
             _init_sqlite()
         logger.info("Database initialised ✅")
@@ -85,7 +78,6 @@ def _init_sqlite():
             reset_expires   DATETIME,
             created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
         );
-
         CREATE TABLE IF NOT EXISTS chat_history (
             id         INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id    INTEGER,
@@ -100,28 +92,29 @@ def _init_sqlite():
     conn.commit()
     conn.close()
 
-def _init_mysql():
-    import mysql.connector
-    # Direct connect to the database (Aiven already creates 'defaultdb')
-    conn = mysql.connector.connect(**MYSQL_CONFIG)
+def _init_postgres():
+    import psycopg2
+    # Connect to Render PostgreSQL
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
     
     statements = [
+        # PostgreSQL uses SERIAL for auto-increment and TEXT/VARCHAR is similar
         """CREATE TABLE IF NOT EXISTS users (
-            id            INT AUTO_INCREMENT PRIMARY KEY,
+            id            SERIAL PRIMARY KEY,
             full_name     VARCHAR(150) NOT NULL,
             email         VARCHAR(150) NOT NULL UNIQUE,
             password_hash VARCHAR(255) NOT NULL,
             branch        VARCHAR(100),
             roll_number   VARCHAR(50) UNIQUE,
-            is_verified   TINYINT(1) DEFAULT 0,
+            is_verified   SMALLINT DEFAULT 0,
             verify_token  VARCHAR(255),
             reset_token   VARCHAR(255),
-            reset_expires DATETIME,
+            reset_expires TIMESTAMP,
             created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )""",
         """CREATE TABLE IF NOT EXISTS chat_history (
-            id         INT AUTO_INCREMENT PRIMARY KEY,
+            id         SERIAL PRIMARY KEY,
             user_id    INT,
             session_id VARCHAR(64),
             question   TEXT,
@@ -131,7 +124,7 @@ def _init_mysql():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )""",
         """CREATE TABLE IF NOT EXISTS files (
-            id        INT AUTO_INCREMENT PRIMARY KEY,
+            id        SERIAL PRIMARY KEY,
             subject   VARCHAR(100),
             topic     VARCHAR(200),
             file_name VARCHAR(255),
@@ -140,14 +133,14 @@ def _init_mysql():
             added_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )""",
         """CREATE TABLE IF NOT EXISTS study_progress (
-            id        INT AUTO_INCREMENT PRIMARY KEY,
+            id        SERIAL PRIMARY KEY,
             user_id   INT,
             subject   VARCHAR(100),
             topic     VARCHAR(200),
             completed BOOLEAN DEFAULT FALSE
         )""",
         """CREATE TABLE IF NOT EXISTS test_results (
-            id       INT AUTO_INCREMENT PRIMARY KEY,
+            id       SERIAL PRIMARY KEY,
             user_id  INT,
             subject  VARCHAR(100),
             score    INT,
