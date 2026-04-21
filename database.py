@@ -19,7 +19,7 @@ if USE_MYSQL:
     # MySQL settings (Aiven के लिए)
     MYSQL_CONFIG = {
         "host":     os.getenv("MYSQL_HOST"),
-        "port":     int(os.getenv("MYSQL_PORT", 24856)),
+        "port":     int(os.getenv("MYSQL_PORT", 19706)),
         "user":     os.getenv("MYSQL_USER", "avnadmin"),
         "password": os.getenv("MYSQL_PASSWORD"),
         "database": os.getenv("MYSQL_DATABASE", "defaultdb"),
